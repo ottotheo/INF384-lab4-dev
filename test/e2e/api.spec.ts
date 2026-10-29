@@ -41,14 +41,27 @@ test('historial devuelve una lista', async ({ page }) => {
   expect(Array.isArray(await r.json())).toBe(true);
 });
 
-test('una transferencia pasa por la URL publica', async ({ page }) => {
+test('una transferencia valida el saldo resultante por la URL publica', async ({ page }) => {
   const r = await page.request.post('/transferir', {
     data: { origen: 'elena', destino: 'ana', monto: 0.01 },
   });
+
   expect(r.status()).toBe(200);
+
   const cuerpo = await r.json();
-  expect(cuerpo).toMatchObject({ origen: 'elena', destino: 'ana', monto: 0.01 });
+
+  expect(cuerpo).toMatchObject({
+    origen: 'elena',
+    destino: 'ana',
+    monto: 0.01,
+  });
+
   expect(typeof cuerpo.id).toBe('number');
+
+  // Verificar que la respuesta incluya un saldo resultante válido.
+  expect(typeof cuerpo.saldoOrigen).toBe('number');
+  expect(Number.isFinite(cuerpo.saldoOrigen)).toBe(true);
+  expect(cuerpo.saldoOrigen).toBeGreaterThanOrEqual(0);
 });
 
 test('cada movimiento del historial involucra al usuario', async ({ page }) => {
