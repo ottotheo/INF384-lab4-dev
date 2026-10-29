@@ -1,9 +1,15 @@
+
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { Counter } from 'k6/metrics';
 
 const BASE = (__ENV.BASE_URL || '').replace(/\/$/, '');
 const SLO_P95 = Number(__ENV.SLO_P95 || 500);
 const USUARIOS = ['ana', 'beto', 'carla', 'diego', 'elena'];
+
+const transferenciasExitosas = new Counter('transferencias_exitosas');
+const transferenciasRechazadas = new Counter('transferencias_rechazadas');
+const respuestasInesperadas = new Counter('respuestas_inesperadas');
 
 http.setResponseCallback(http.expectedStatuses(200, 400));
 
@@ -32,11 +38,33 @@ export default function () {
   const t = http.post(
     `${BASE}/transferir`,
     JSON.stringify({ origen, destino, monto: 1 }),
-    { headers: { 'content-type': 'application/json' }, tags: { endpoint: 'transferir' } },
+    {
+      headers: { 'content-type': 'application/json' },
+      tags: { endpoint: 'transferir' },
+    },
   );
-  check(t, { 'transferir 200 o 400': (r) => r.status === 200 || r.status === 400 });
 
-  const s = http.get(`${BASE}/saldo/${origen}`, { tags: { endpoint: 'saldo' } });
+  if (t.status === 200) {
+    transferenciasExitosas.add(1);
+  } else if (
+    t.status === 400 &&
+    t.json('error') === 'saldo insuficiente'
+  ) {
+    transferenciasRechazadas.add(1);
+  } else {
+    respuestasInesperadas.add(1);
+  }
+
+  check(t, {
+    'transferencia exitosa o rechazo esperado': (r) =>
+      r.status === 200 ||
+      (r.status === 400 && r.json('error') === 'saldo insuficiente'),
+  });
+
+  const s = http.get(`${BASE}/saldo/${origen}`, {
+    tags: { endpoint: 'saldo' },
+  });
+
   check(s, { 'saldo 200': (r) => r.status === 200 });
 
   sleep(1);
