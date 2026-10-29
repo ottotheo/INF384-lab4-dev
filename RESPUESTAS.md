@@ -157,3 +157,11 @@ Se introdujo deliberadamente un defecto funcional en `src/wallet.js`, modificand
 **Conclusión:** El pipeline detectó el defecto funcional mediante una prueba unitaria y marcó el job como fallido. Se demuestra que la validación automática puede impedir que un cambio defectuoso sea aceptado como correcto, siempre que los controles de integración exijan la aprobación de dicho job.
 
 El Pull Request se mantiene sin fusionar para conservar la evidencia.
+
+---
+
+- **Presupuesto de duración:** 8 minutos (valor provisional).
+- **Métrica DORA asignada:** Change Failure Rate (CFR)
+  (valor provisional).
+
+---
