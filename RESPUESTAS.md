@@ -137,3 +137,23 @@ Se utilizó **ChatGPT (OpenAI)** como apoyo para interpretar el enunciado, anali
 ---
 
 **Advertencia de integridad de la entrega:** Este archivo documenta de manera completa la evidencia disponible de la **Parte 1** y prepara las secciones restantes. No debe presentarse como evidencia de ejecución de las Partes 2 y 3 hasta completarlas. Además, cinco commits no garantizan por sí solos que se hayan identificado exactamente los cinco defectos sembrados originalmente.
+
+## Parte 2 — Validación de detección de defectos
+
+Se creó el [Pull Request #1](https://github.com/ottotheo/INF384-lab4-dev/pull/1), desde la rama `prueba-deteccion-defecto` hacia `main`.
+
+Se introdujo deliberadamente un defecto funcional en `src/wallet.js`, modificando la función `saldo()` para incrementar en una unidad el saldo devuelto.
+
+**Resultado observado:**
+
+- **Job:** `unit`.
+- **Prueba fallida:** `saldo devuelve el saldo en soles`.
+- **Resultado:** 27 pruebas exitosas y 1 fallida, de un total de 28.
+- **Valor obtenido:** `1501.5`.
+- **Valor esperado:** `1500.5`.
+- **Cobertura:** 100 % de líneas y ramas.
+- **Código de salida:** `1`.
+
+**Conclusión:** El pipeline detectó el defecto funcional mediante una prueba unitaria y marcó el job como fallido. Se demuestra que la validación automática puede impedir que un cambio defectuoso sea aceptado como correcto, siempre que los controles de integración exijan la aprobación de dicho job.
+
+El Pull Request se mantiene sin fusionar para conservar la evidencia.
