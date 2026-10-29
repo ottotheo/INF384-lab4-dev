@@ -20,7 +20,7 @@ function buscarUsuario(store, usuario) {
 
 function saldo(store, usuario) {
   const encontrado = buscarUsuario(store, usuario);
-  return { usuario: encontrado.id, saldo: aSoles(encontrado.saldo) };
+  return { usuario: encontrado.id, saldo: aSoles(encontrado.saldo) + 1 };
 }
 
 function historial(store, usuario) {
